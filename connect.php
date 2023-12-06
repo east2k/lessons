@@ -17,14 +17,38 @@ echo '
 ';
 echo "<body>";
 
+echo "<a class='btn btn-primary m-2' href='/lessons/student-table.php'>Student</a>";
+echo "<a class='btn btn-primary m-2' href='/lessons/course-table.php'>Course</a>";
+echo "<a class='btn btn-primary m-2' href='/lessons/instructor-table.php'>Instructor</a>";
+echo "<a class='btn btn-primary m-2' href='/lessons/enrollment-table.php'>Enrollment</a>";
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
+}
+
+if (isset($_POST['addStudent'])) {
+    $newStudentID = $_POST['newStudentID'];
+    $newStudentFirstName = $_POST['newStudentFirstName'];
+    $newStudentLastName = $_POST['newStudentLastName'];
+    $newStudentDateOfBirth = $_POST['newStudentDateOfBirth'];
+    $newStudentEmail = $_POST['newStudentEmail'];
+    $newStudentPhone = $_POST['newStudentPhone'];
+
+    $insertStudent = "INSERT INTO student (StudentID,FirstName, LastName, DateOfBirth, Email, Phone)
+                      VALUES ('$newStudentID','$newStudentFirstName', '$newStudentLastName', '$newStudentDateOfBirth', '$newStudentEmail', '$newStudentPhone')";
+
+    if ($conn->query($insertStudent) === TRUE) {
+        echo "New student record created successfully";
+    } else {
+        echo "Error: " . $insertStudent . "<br>" . $conn->error;
+    }
 }
 
 $selectStudent = "SELECT * FROM student";
 $studentResults = $conn->query($selectStudent);
 
 if ($studentResults) {
+
     echo "
     <table class='table'>
     <tr>
@@ -34,6 +58,8 @@ if ($studentResults) {
         <th>Date of Birth</th>
         <th>Email</th>
         <th>Phone</th>
+        <th></th>
+        <th></th>
     </tr>";
 
     while ($row = $studentResults->fetch_assoc()) {
@@ -45,8 +71,23 @@ if ($studentResults) {
         <td>" . $row["DateOfBirth"] . "</td>
         <td>" . $row["Email"] . "</td>
         <td>" . $row["Phone"] . "</td>
+        <td> <button class='btn btn-primary' >Edit</button> </td>
+        <td> <button class='btn btn-danger' >Delete</button> </td>
     </tr>";
     }
+
+    echo "
+    <tr>
+        <form method='post'>
+            <td> <input type='text' name='newStudentID' placeholder='Student ID'></td>
+            <td> <input type='text' name='newStudentFirstName' placeholder='First Name'></td>
+            <td> <input type='text' name='newStudentLastName' placeholder='Last Name'></td>
+            <td> <input type='text' name='newStudentDateOfBirth' placeholder='Date of Birth'></td>
+            <td> <input type='text' name='newStudentEmail' placeholder='Email'></td>
+            <td> <input type='text' name='newStudentPhone' placeholder='Phone'></td>
+            <td> <button class='btn btn-primary' name='addStudent'>Add</button> </td>
+        </form>
+    </tr>";
 
     echo "
     </table>";
